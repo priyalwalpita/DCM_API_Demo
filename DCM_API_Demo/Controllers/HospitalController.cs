@@ -15,8 +15,8 @@ public class HospitalController : ControllerBase
         _logger = logger;
     }
     
-    [HttpGet(Name = "GetAllHospitals")]
-    [Authorize]
+    [HttpGet("GetAllHospitals")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Get()
     {
 
@@ -28,6 +28,22 @@ public class HospitalController : ControllerBase
         hospitals.Add(new Hospital{ Id = Guid.NewGuid(), Name = "Hos 2", State = "VIC", HeadDoctor = "Doc 2"});
 
         return Ok(hospitals);
+
+    }
+    
+    [HttpGet("GetAllDoctors")]
+    [Authorize(Policy = "IsVicDoctor")]
+    public async Task<IActionResult> GetDoctors()
+    {
+
+        var claims = User.Claims;
+        
+        List<Doctor> docs = new List<Doctor>();
+        
+        docs.Add(new Doctor{ Id = Guid.NewGuid(), Name = "Doc 1", Speciality = "Cardiology"});
+        docs.Add(new Doctor{ Id = Guid.NewGuid(), Name = "Doc 2", Speciality = "Dentist"});
+
+        return Ok(docs);
 
     }
 }

@@ -13,8 +13,19 @@ builder.Services.AddAuthentication("Bearer")
         opt.RequireHttpsMetadata = false;
         opt.Authority = "http://localhost:5240";
         opt.Audience = "dcmapi";
+        opt.MapInboundClaims = true;
     });
 
+
+builder.Services.AddAuthorization(authOpt =>
+{
+    authOpt.AddPolicy("IsVicDoctor", policyBuilder =>
+    {
+        policyBuilder.RequireAuthenticatedUser();
+        policyBuilder.RequireClaim("state", "vic");
+        policyBuilder.RequireClaim("position", "doctor");
+    });
+});
 
 var app = builder.Build();
 
@@ -29,6 +40,11 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+// app.UseEndpoints(endpoints =>
+// {
+//     endpoints.MapControllers()
+//         .RequireAuthorization("dcmapi");
+// });
 
 app.MapControllers();
 
